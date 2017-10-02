@@ -23,7 +23,7 @@ setup(name='roi-pooling',
             description='ROI pooling as a custom TensorFlow operation',
             author='deepsense.io',
             packages=['roi_pooling'],
-            package_data={'roi_pooling': ['roi_pooling.so']},
+            package_data={'roi_pooling': ['roi_pooling.so','roi_pooling_3d.so']},
             cmdclass={'install': MyInstall}
 )
 
