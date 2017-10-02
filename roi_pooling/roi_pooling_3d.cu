@@ -56,7 +56,7 @@ __global__ void RoiPooling3DKernel(const Dtype* input, const int* rois,
     int c  = idx4_2(index, n_rois, channels, pooled_height, pooled_width, pooled_depth);
     int n  = idx4_1(index, n_rois, channels, pooled_height, pooled_width, pooled_depth);
 
-    auto bottom_rois_act = rois + n * 5;
+    auto bottom_rois_act = rois + n * 7;
 
     int roi_batch_ind = bottom_rois_act[0];
     int roi_start_d = bottom_rois_act[1];
@@ -68,9 +68,9 @@ __global__ void RoiPooling3DKernel(const Dtype* input, const int* rois,
 
     // Force malformed ROIs to be 1x1
     // NOTE(maciek): roi_start, roi_end seems to be inclusive
+    int roi_depth  = max(roi_end_d - roi_start_d + 1, 1);
     int roi_width  = max(roi_end_w - roi_start_w + 1, 1);
     int roi_height = max(roi_end_h - roi_start_h + 1, 1);
-    int roi_depth  = max(roi_end_d - roi_start_d + 1, 1);
 
     // divide the ROIs into smaller regions for max pooling
     Dtype bin_size_h = static_cast<Dtype>(roi_height) / static_cast<Dtype>(pooled_height);
@@ -155,7 +155,7 @@ __global__ void RoiPooling3DGradKernel(const Dtype* orig_input, const int* orig_
     Dtype gradient = 0;
     // Accumulate gradient over all ROIs that pooled this element
     for (int roi_n = 0; roi_n < n_rois; ++roi_n) {
-      const int* offset_bottom_rois = orig_rois + roi_n * 5;
+      const int* offset_bottom_rois = orig_rois + roi_n * 7;
       int roi_batch_ind = offset_bottom_rois[0];
       // Skip if ROI's batch index doesn't match n
       if (n != roi_batch_ind) {
@@ -185,9 +185,9 @@ __global__ void RoiPooling3DGradKernel(const Dtype* orig_input, const int* orig_
       // this bottom unit
 
       // Force malformed ROIs to be 1x1
+      int roi_depth = max(roi_end_d - roi_start_d + 1, 1);
       int roi_width = max(roi_end_w - roi_start_w + 1, 1);
       int roi_height = max(roi_end_h - roi_start_h + 1, 1);
-      int roi_depth = max(roi_end_d - roi_start_d + 1, 1);
 
       Dtype bin_size_h = static_cast<Dtype>(roi_height) / static_cast<Dtype>(pooled_height);
       Dtype bin_size_w = static_cast<Dtype>(roi_width) / static_cast<Dtype>(pooled_width);

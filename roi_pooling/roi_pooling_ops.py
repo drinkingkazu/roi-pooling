@@ -84,7 +84,7 @@ def _RoiPooling3DShape(op):
     rois = op.inputs[1]
 
     n_rois = rois.get_shape()[0]
-    n_channels = input.get_shape()[3]
+    n_channels = input.get_shape()[4]
     pool_height = op.get_attr('pool_height')
     pool_width = op.get_attr('pool_width')
     pool_depth = op.get_attr('pool_depth')
